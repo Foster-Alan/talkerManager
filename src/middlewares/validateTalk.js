@@ -12,7 +12,7 @@ function validateWatchedAt(req, res) {
   function validateRate(req, res) {
     const numbers = [1, 2, 3, 4, 5];
     const { talk } = req.body;
-    if (!talk.rate) {
+    if (talk.rate === undefined) {
       return res.status(400).json({ message: 'O campo "rate" é obrigatório' });
     }
     if (!(numbers.includes(talk.rate))) {

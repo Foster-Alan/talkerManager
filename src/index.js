@@ -13,6 +13,7 @@ const { validateTalk } = require('./middlewares/validateTalk');
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
+const talkerjson = 'src/talker.json';
 
 // não remova esse endpoint, e para o avaliador funcionarr
 app.get('/', (_request, response) => {
@@ -21,13 +22,13 @@ app.get('/', (_request, response) => {
 
 // GET 
 app.get('/talker', async (req, res) => {
-  const data = JSON.parse(fs.readFileSync('src/talker.json', 'utf8'));
+  const data = JSON.parse(fs.readFileSync(talkerjson, 'utf8'));
   res.status(200).json(data);
 });
 
 // GET
 app.get('/talker/:id', async (req, res) => {
-  const arr = JSON.parse(fs.readFileSync('src/talker.json', 'utf8'));
+  const arr = JSON.parse(fs.readFileSync(talkerjson, 'utf8'));
   const obj = arr.find((param) => param.id === Number(req.params.id));
 
   if (obj) return res.status(200).json(obj);
@@ -43,13 +44,30 @@ app.post('/talker',
   validateAuthentication, validateName, validateAge, validateTalk,
   (req, res) => {
   const { name, age, talk } = req.body;
-  const talkers = JSON.parse(fs.readFileSync('src/talker.json'));
+  const talkers = JSON.parse(fs.readFileSync(talkerjson));
 
   const addTalker = { id: talkers.length + 1, name, age, talk };
 
   talkers.push(addTalker);
-  fs.writeFileSync('src/talker.json', JSON.stringify(talkers));
+  fs.writeFileSync(talkerjson, JSON.stringify(talkers));
   res.status(201).json(addTalker);
+});
+
+app.put('/talker/:id',
+  validateAuthentication,
+  validateName, validateAge, validateTalk,
+  (req, res) => {
+  const id = Number(req.params.id);
+  const talkers = JSON.parse(fs.readFileSync(talkerjson));
+
+  talkers.filter((e) => e.id !== id);
+  const update = { id, ...req.body };
+
+  talkers.push(update);
+  fs.writeFileSync(talkerjson, JSON.stringify(talkers));
+
+  console.log(talkers);
+  res.status(200).json(update);
 });
 
 app.listen(PORT, () => {
