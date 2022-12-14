@@ -1,10 +1,15 @@
 const express = require('express');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const app = express();
 app.use(express.json());
 const { validateEmail } = require('./middlewares/validateEmail');
 const { validatePassword } = require('./middlewares/validatePassword');
+const { validateAuthentication } = require('./middlewares/validateAuthentication');
+const { validateName } = require('./middlewares/validateName');
+const { validateAge } = require('./middlewares/validateAge');
+const { validateTalk } = require('./middlewares/validateTalk');
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
@@ -13,16 +18,6 @@ const PORT = '3000';
 app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
-
-// test
-function tokenRandom(length) {
-  let randomString = '';
-  const caract = '123456789abcdefg';
-  for (let i = 0; i < length; i += 1) {
-      randomString += caract.charAt(Math.floor(Math.random() * caract.length));
-  }
-  return randomString;
-} 
 
 // GET 
 app.get('/talker', async (req, res) => {
@@ -41,11 +36,20 @@ app.get('/talker/:id', async (req, res) => {
 
 // POST
 app.post('/login', validateEmail, validatePassword, (req, res) => {
-  const { email, password } = req.body;
-  fs.writeFileSync('src/talker.json', JSON.stringify({ email, password }));
+  res.status(200).json({ token: crypto.randomBytes(8).toString('hex') });
+});
 
-  const token = tokenRandom(16);
-  return res.status(200).json({ token });
+app.post('/talker',
+  validateAuthentication, validateName, validateAge, validateTalk,
+  (req, res) => {
+  const { name, age, talk } = req.body;
+  const talkers = JSON.parse(fs.readFileSync('src/talker.json'));
+
+  const addTalker = { id: talkers.length + 1, name, age, talk };
+
+  talkers.push(addTalker);
+  fs.writeFileSync('src/talker.json', JSON.stringify(talkers));
+  res.status(201).json(addTalker);
 });
 
 app.listen(PORT, () => {
