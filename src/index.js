@@ -70,6 +70,18 @@ app.put('/talker/:id',
   res.status(200).json(update);
 });
 
+// DELETE /talker/:id
+app.delete('/talker/:id',
+  validateAuthentication,
+  (req, res) => {
+  const id = Number(req.params.id);
+  const talkers = JSON.parse(fs.readFileSync(talkerjson));
+
+  const newArr = talkers.filter((e) => e.id !== id);
+  fs.writeFileSync(talkerjson, JSON.stringify(newArr));
+  res.status(204).json();
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 });
