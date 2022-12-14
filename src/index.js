@@ -13,13 +13,13 @@ app.get('/', (_request, response) => {
 });
 
 // test
-function tokenRandom(tamanho) {
-  let stringAleatoria = '';
-  const caracteres = '123456789abcdefg';
-  for (let i = 0; i < tamanho; i += 1) {
-      stringAleatoria += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+function tokenRandom(length) {
+  let randomString = '';
+  const caract = '123456789abcdefg';
+  for (let i = 0; i < length; i += 1) {
+      randomString += caract.charAt(Math.floor(Math.random() * caract.length));
   }
-  return stringAleatoria;
+  return randomString;
 } 
 
 // GET 
