@@ -12,6 +12,16 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+// test
+function tokenRandom(tamanho) {
+  let stringAleatoria = '';
+  const caracteres = '123456789abcdefg';
+  for (let i = 0; i < tamanho; i += 1) {
+      stringAleatoria += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+  }
+  return stringAleatoria;
+} 
+
 // GET 
 app.get('/talker', async (req, res) => {
   const data = JSON.parse(fs.readFileSync('src/talker.json', 'utf8'));
@@ -25,6 +35,15 @@ app.get('/talker/:id', async (req, res) => {
 
   if (obj) return res.status(200).json(obj);
   return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+});
+
+// POST
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  fs.writeFileSync('src/talker.json', JSON.stringify({ email, password }));
+
+  const token = tokenRandom(16);
+  return res.status(200).json({ token });
 });
 
 app.listen(PORT, () => {
