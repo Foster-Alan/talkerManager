@@ -3,6 +3,8 @@ const fs = require('fs');
 
 const app = express();
 app.use(express.json());
+const { validateEmail } = require('./middlewares/validateEmail');
+const { validatePassword } = require('./middlewares/validatePassword');
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
@@ -38,7 +40,7 @@ app.get('/talker/:id', async (req, res) => {
 });
 
 // POST
-app.post('/login', (req, res) => {
+app.post('/login', validateEmail, validatePassword, (req, res) => {
   const { email, password } = req.body;
   fs.writeFileSync('src/talker.json', JSON.stringify({ email, password }));
 
